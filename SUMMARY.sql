@@ -1,1 +1,174 @@
-vv
+#--Left Join 1
+select S.NAME_OF_SCHOOL,C.COMMUNITY_AREA_NAME,S.AVERAGE_STUDENT_ATTENDANCE,S.AVERAGE_TEACHER_ATTENDANCE
+FROM CENSUS_DATA AS C
+LEFT OUTER JOIN CHICAGO_PUBLIC_SCHOOLS AS S
+ON C.COMMUNITY_AREA_NAME = S.COMMUNITY_AREA_NAME
+WHERE C.HARDSHIP_INDEX = 98
+
+-- Left Join 2
+select C.COMMUNITY_AREA_NAME,D.CASE_NUMBER,D.PRIMARY_TYPE
+FROM CHICAGO_CRIME_DATA  AS D
+LEFT OUTER JOIN CENSUS_DATA AS C
+ON D.COMMUNITY_AREA_NUMBER = C.COMMUNITY_AREA_NUMBER
+WHERE D.LOCATION_DESCRIPTION LIKE '%SCHOOL%';
+
+-- Creating Views In Tables
+CREATE OR REPLACE VIEW CHICAGO_PUBLIC_SCHOOL (School_Name,Safety_Rating,Family_Rating,Enviroment_Rating,Instruction_Rating,Leaders_Rating,Teachers_Rating)
+AS
+SELECT NAME_OF_SCHOOL,SAFETY_ICON,FAMILY_INVOLVEMENT_ICON,ENVIRONMENT_ICON,INSTRUCTION_ICON,INSTRUCTION_ICON,TEACHERS_ICON
+FROM CHICAGO_PUBLIC_SCHOOLS;
+
+SELECT School_Name,Leaders_Rating FROM CHICAGO_PUBLIC_SCHOOL
+
+-- Creating Stored Procedures
+--#SET TERMINATOR @
+CREATE OR REPLACE PROCEDURE UPDATE_LEADERS_SCORE ( 
+    IN SCHOOL_ID INTEGER, IN LEADER_SCORE INTEGER )       
+
+LANGUAGE SQL                        
+MODIFIES SQL DATA                     
+
+BEGIN   
+
+END    
+@ 
+
+
+-- Updating a tables in a stored procedure
+--#SET TERMINATOR @
+CREATE OR REPLACE PROCEDURE UPDATE_LEADERS_SCORE ( 
+    IN in_School_ID INTEGER, IN in_Leader_Score INTEGER)
+
+LANGUAGE SQL                                               
+MODIFIES SQL DATA                                          
+
+BEGIN
+	UPDATE CHICAGO_PUBLIC_SCHOOLS
+	SET LEADERS_SCORE = in_Leader_Score
+	WHERE SCHOOL_ID = in_School_ID;
+	       
+END
+@
+
+-- Adding If Statements to Procedures
+--#SET TERMINATOR @
+CREATE OR REPLACE PROCEDURE UPDATE_LEADERS_SCORE ( 
+    IN in_School_ID INTEGER, IN in_Leader_Score INTEGER)     
+
+LANGUAGE SQL                                                
+MODIFIES SQL DATA                                          
+
+BEGIN 
+	
+	UPDATE CHICAGO_PUBLIC_SCHOOLS
+	SET LEADERS_SCORE = in_Leader_Score
+	WHERE SCHOOL_ID = in_School_ID;
+		
+	IF in_Leader_Score > 0 AND in_Leader_Score < 20 THEN
+      	UPDATE CHICAGO_PUBLIC_SCHOOLS
+		SET LEADERS_ICON = 'Very Weak';
+		
+    ELSEIF in_Leader_Score < 40 THEN
+       	UPDATE CHICAGO_PUBLIC_SCHOOLS
+		SET LEADERS_ICON = 'Weak';
+		
+    ELSEIF in_Leader_Score < 60 THEN
+       	UPDATE CHICAGO_PUBLIC_SCHOOLS
+		SET LEADERS_ICON = 'Average';
+		
+    ELSEIF in_Leader_Score < 80 THEN
+       	UPDATE CHICAGO_PUBLIC_SCHOOLS
+		SET LEADERS_ICON = 'Strong';
+		
+    ELSEIF in_Leader_Score < 100 THEN
+       	UPDATE CHICAGO_PUBLIC_SCHOOLS
+		SET LEADERS_ICON = 'Very Strong';
+		
+   	
+   	END IF;
+                                                 
+END
+@  
+
+--Adding Rollback for transactions
+--#SET TERMINATOR @
+CREATE OR REPLACE PROCEDURE UPDATE_LEADERS_SCORE (
+IN in_School_ID INTEGER, IN in_Leader_Score INTEGER)
+  
+LANGUAGE SQL
+MODIFIES SQL DATA
+  
+BEGIN 
+
+	UPDATE CHICAGO_PUBLIC_SCHOOLS
+	SET LEADERS_SCORE = in_Leader_Score
+		WHERE SCHOOL_ID = in_School_ID;
+		
+	IF in_Leader_Score > 0 AND in_Leader_Score < 20 THEN
+      	UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET LEADERS_ICON = 'Very Weak';
+    
+    ELSEIF in_Leader_Score < 40 THEN
+       	UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET LEADERS_ICON = 'Weak';	
+    
+    ELSEIF in_Leader_Score < 60 THEN
+       	UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET LEADERS_ICON = 'Average';
+    
+    ELSEIF in_Leader_Score < 80 THEN
+       	UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET LEADERS_ICON = 'Strong';
+    
+    ELSEIF in_Leader_Score < 100 THEN
+       	UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET LEADERS_ICON = 'Very Strong';
+	ELSE
+		ROLLBACK WORK;
+   	END IF;
+	
+END
+@
+
+-- Add commit to the transaction query
+--#SET TERMINATOR @
+CREATE OR REPLACE PROCEDURE UPDATE_LEADERS_SCORE (
+IN in_School_ID INTEGER, IN in_Leader_Score INTEGER)
+  
+LANGUAGE SQL
+MODIFIES SQL DATA
+  
+BEGIN 
+
+	UPDATE CHICAGO_PUBLIC_SCHOOLS
+	SET LEADERS_SCORE = in_Leader_Score
+		WHERE SCHOOL_ID = in_School_ID;
+		
+	IF in_Leader_Score > 0 AND in_Leader_Score < 20 THEN
+      	UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET LEADERS_ICON = 'Very Weak';
+    
+    ELSEIF in_Leader_Score < 40 THEN
+       	UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET LEADERS_ICON = 'Weak';	
+    
+    ELSEIF in_Leader_Score < 60 THEN
+       	UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET LEADERS_ICON = 'Average';
+    
+    ELSEIF in_Leader_Score < 80 THEN
+       	UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET LEADERS_ICON = 'Strong';
+    
+    ELSEIF in_Leader_Score < 100 THEN
+       	UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET LEADERS_ICON = 'Very Strong';
+	ELSE
+		ROLLBACK WORK;
+   	END IF;
+   	COMMIT WORK;
+	
+END
+@	
+
+---
