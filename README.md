@@ -1,1 +1,2 @@
-This Repo Contains Some Of The SQL Scripts I Found Challenging While Working On A Project.
+This Repo contains SQL statements i found interesting and challenging. This will remind you how to insert and query information from tables.
+
